@@ -3,6 +3,7 @@ node_modules/
 
 # Auth & secrets (never commit session data)
 config/auth.json
+browser_session/
 .env
 .env.local
 *.pem
