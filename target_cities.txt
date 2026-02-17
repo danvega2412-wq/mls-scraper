@@ -1,0 +1,8 @@
+Yes, absolutely! Since target_cities.txt is blank, the scraper has no idea which cities to look for. Think of this file as the GPS coordinates for your bot.
+
+If you run the script while this file is empty, it will either crash or search for nothing.
+
+Step 1: Fill the "GPS" (Target Cities)
+Click into that blank target_cities.txt file on your screen and type (or paste) your list exactly like this:
+
+Grapevine, Colleyville, Southlake, Euless, Bedford, Hurst, Flower Mound

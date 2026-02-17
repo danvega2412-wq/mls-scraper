@@ -1,0 +1,34 @@
+# Dependencies
+node_modules/
+
+# Auth & secrets (never commit session data)
+config/auth.json
+.env
+.env.local
+*.pem
+
+# Output & generated
+my_daily_leads.csv
+photos/
+crash_report.png
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+*.egg-info/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Logs
+*.log
+npm-debug.log*
