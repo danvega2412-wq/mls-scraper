@@ -4,7 +4,7 @@ load_dotenv(dotenv_path='../.env')
 from pinecone import Pinecone, ServerlessSpec
 
 PINECONE_KEY = os.environ.get('PINECONE_API_KEY')
-CLAUDE_KEY = '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'
+CLAUDE_KEY = os.environ.get("ANTHROPIC_API_KEY")
 INDEX_NAME = 'earl-audits'
 
 def get_index():

@@ -5,7 +5,7 @@ from dotenv import load_dotenv
 load_dotenv(dotenv_path="../.env")
 
 GEMINI_KEY = os.environ.get("GEMINI_API_KEY")
-CLAUDE_KEY = "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"
+CLAUDE_KEY = os.environ.get("CLAUDE_API_KEY")
 
 EARL_SYSTEM = (
     "You are Earl, a real estate agent writing a personal note to a homeowner whose listing has not sold. "
