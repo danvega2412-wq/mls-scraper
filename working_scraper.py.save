@@ -1,0 +1,167 @@
+#!/usr/bin/env python3
+import os
+import sys
+import json
+import time
+import argparse
+import requests
+from pathlib import Path
+from playwright.sync_api import sync_playwright
+
+SCRIPT_DIR = Path(os.path.dirname(os.path.abspath(__file__)))
+CONFIG_DIR = SCRIPT_DIR / "config"
+AUTH_FILE = CONFIG_DIR / "auth.json"
+PHOTOS_DIR = SCRIPT_DIR / "photos"
+BASE_URL = "https://matrix.ntreis.net"
+MFA_PAUSE = 45
+
+def log(msg):
+    print(f"[{time.strftime('%H:%M:%S')}] {msg}")
+
+def load_session():
+    if not AUTH_FILE.exists():
+        log(f"No auth.json found at {AUTH_FILE}")
+        return None
+    with open(AUTH_FILE) as f:
+        return json.load(f)
+
+def save_session(context):
+    CONFIG_DIR.mkdir(parents=True, exist_ok=True)
+    with open(AUTH_FILE, "w") as f:
+        json.dump({"cookies": context.cookies()}, f, indent=2)
+    log("Session saved.")
+
+def make_photo_dir(mls_number):
+    d = PHOTOS_DIR / mls_number
+    d.mkdir(parents=True, exist_ok=True)
+    return d
+
+def download_image(url, dest, session_cookies):
+    try:
+        jar = {c["name"]: c["value"] for c in session_cookies}
+        resp = requests.get(url, cookies=jar, timeout=20, stream=True)
+        resp.raise_for_status()
+        with open(dest, "wb") as f:
+            for chunk in resp.iter_content(chunk_size=8192):
+                f.write(chunk)
+        return True
+    except Exception as e:
+        log(f"Download failed: {e}")
+        return False
+
+def check_logged_in(page):
+    try:
+        return (
+            "matrix" in page.url.lower() and
+            not any(x in page.url.lower() for x in ["login", "clareity", "idp", "sso"]) and
+            page.locator("#m_lblUserFullName, #headerbar, .MatrixHeader").count() > 0
+        )
+    except Exception:
+        return False
+
+def search_by_mls(page, mls_number):
+    try:
+        qs = page.locator("input#m_QuickSearchInputBox, input[name='QuickSearch']")
+        if qs.count() > 0:
+            log("Using Quick Search bar...")
+            qs.first.fill(mls_number)
+            qs.first.press("Enter")
+            page.wait_for_load_state("networkidle", timeout=15000)
+            if page.locator(".matrix-photo-gallery, #m_ucPhotoPanel, .PhotoGallery").count() > 0:
+                return page.url
+        direct = f"{BASE_URL}/Matrix/Search/ResidentListings?SearchType=listing&M={mls_number}"
+        log("Trying direct URL...")
+        page.goto(direct, wait_until="networkidle", timeout=20000)
+        if page.locator(".matrix-photo-gallery, #m_ucPhotoPanel, .PhotoGallery").count() > 0:
+            return page.url
+        return None
+    except Exception as e:
+        log(f"Search error: {e}")
+        return None
+
+def extract_photo_urls(page):
+    urls = []
+    try:
+        page.wait_for_load_state("networkidle", timeout=10000)
+        time.sleep(2)
+        imgs = page.locator(
+            ".matrix-photo-gallery img, #m_ucPhotoPanel img, "
+            ".PhotoGallery img, img[src*='/photos/']"
+        ).all()
+        for img in imgs:
+            src = (img.get_attribute("src") or img.get_attribute("data-src") or "").strip()
+            if src and src not in urls:
+                urls.append(src if src.startswith("http") else BASE_URL + src)
+        if not urls:
+            all_imgs = page.locator("img").all()
+            for img in all_imgs:
+                src = (img.get_attribute("src") or "").strip()
+                if src and any(kw in src.lower() for kw in ["/photo", "/image", "/listing"]):
+                    full = src if src.startswith("http") else BASE_URL + src
+                    if full not in urls:
+                        urls.append(full)
+    except Exception as e:
+        log(f"Photo error: {e}")
+    return [u for u in urls if len(u) > 20]
+
+def snipe_listing(mls_number, headless=False):
+    mls_number = str(mls_number).strip()
+    log(f"SNIPER ENGAGED - MLS# {mls_number}")
+    session = load_session()
+    photo_dir = make_photo_dir(mls_number)
+    with sync_playwright() as p:
+        browser = p.chromium.launch(headless=headless)
+        context = browser.new_context()
+        if session and session.get("cookies"):
+            context.add_cookies(session["cookies"])
+            log("Cookies loaded...")
+        page = context.new_page()
+        page.goto(BASE_URL + "/Matrix/", wait_until="domcontentloaded")
+        time.sleep(5)
+        if not check_logged_in(page):
+            log(f"Not logged in. You have {MFA_PAUSE} seconds to log in...")
+            time.sleep(MFA_PAUSE)
+            if not check_logged_in(page):
+                browser.close()
+                return {"status": "error", "message": "Login failed."}
+            save_session(context)
+        log("Logged in. Searching...")
+        listing_url = search_by_mls(page, mls_number)
+        if not listing_url:
+            browser.close()
+            return {"status": "error", "message": "Listing not found."}
+        log("Listing found. Grabbing photos...")
+        photo_urls = extract_photo_urls(page)
+        if not photo_urls:
+            browser.close()
+            return {"status": "error", "message": "No photos found."}
+        log(f"{len(photo_urls)} photos found. Downloading...")
+        cookies = context.cookies()
+        saved = 0
+        for i, url in enumerate(photo_urls, start=1):
+            ext = ".jpg"
+            for e in [".jpg", ".jpeg", ".png", ".webp"]:
+                if url.lower().split("?")[0].endswith(e):
+                    ext = e
+                    break
+            dest = photo_dir / f"img_{i:03d}{ext}"
+            if download_image(url, dest, cookies):
+                saved += 1
+                log(f"Saved [{i}/{len(photo_urls)}]")
+        browser.close()
+    log(f"Done. {saved} photos saved.")
+    return {"status": "ok", "mls": mls_number, "photo_dir": str(photo_dir), "count": saved}
+
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser()
+    parser.add_argument("mls_number", help="MLS number")
+    parser.add_argument("--headless", action="store_true")
+    args = parser.parse_args()
+    result = snipe_listing(args.mls_number, headless=args.headless)
+    print("\n" + "="*50)
+    if result["status"] == "ok":
+        print(f"Photos: {result['count']} saved to {result['photo_dir']}")
+    else:
+        print(f"Error: {result['message']}")
+nano working_scraper.py
+
