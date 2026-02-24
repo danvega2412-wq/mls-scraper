@@ -1,0 +1,30 @@
+[11:43:14] 
+🎯  SNIPER ENGAGED — MLS# 21161161
+[11:43:18] 🍪  Cookies loaded — attempting session restore…
+[11:43:26] ⏳  Not authenticated.  You have 45s to log in + complete MFA…
+[11:44:11] ❌  Login failed after pause. Check credentials / MFA.
+[11:47:33] 
+🎯  SNIPER ENGAGED — MLS# 21161161
+[11:47:34] 🍪  Cookies loaded — attempting session restore…
+[11:47:42] ⏳  Not authenticated.  You have 120s to log in + complete MFA…
+[11:49:42] 💾  Session saved → /Users/danielvega/Desktop/Real Estate Tool/mls-scraper/config/auth.json
+[11:49:42] 💾  Session saved → /Users/danielvega/Desktop/Real Estate Tool/mls-scraper/config/auth.json
+[11:49:42] ✅  Authenticated.
+[11:49:42]    Trying direct URL: https://matrix.ntreis.net/Matrix/Search/ResidentListings?SearchType=listing&M=21161161
+[11:49:48]    Trying Residential Search form…
+[11:49:52]    ⚠️  All search strategies exhausted.
+[11:49:52] ❌  Could not locate listing in Matrix search.
+[11:54:53] 
+🎯  SNIPER ENGAGED — MLS# 21161161
+[11:54:55] 🍪  Cookies loaded — attempting session restore…
+[11:55:02] ⏳  Not authenticated.  You have 120s to log in + complete MFA…
+[11:57:02] 💾  Session saved → /Users/danielvega/Desktop/Real Estate Tool/mls-scraper/config/auth.json
+[11:57:02] 💾  Session saved → /Users/danielvega/Desktop/Real Estate Tool/mls-scraper/config/auth.json
+[11:57:02] ✅  Authenticated.
+[11:57:02]    Using Quick Search bar…
+[11:57:03]    Trying direct URL: https://matrix.ntreis.net/Matrix/Search/ResidentListings?SearchType=listing&M=21161161
+[11:57:03]    Unexpected error during search: Page.goto: net::ERR_ABORTED at https://matrix.ntreis.net/Matrix/Search/ResidentListings?SearchType=listing&M=21161161
+Call log:
+  - navigating to "https://matrix.ntreis.net/Matrix/Search/ResidentListings?SearchType=listing&M=21161161", waiting until "networkidle"
+
+[11:57:03] ❌  Could not locate listing in Matrix search.
