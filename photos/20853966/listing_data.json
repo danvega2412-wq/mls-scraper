@@ -1,0 +1,22 @@
+{
+  "price": "$445,000",
+  "sqft": "2,544",
+  "mud": "No",
+  "pid": "No",
+  "beds": "3",
+  "baths": "2",
+  "year_built": "2019",
+  "dom": "364",
+  "photos_total": "28",
+  "address": "5908 Trail Marker Court",
+  "city": "Fort Worth",
+  "mls": "20853966",
+  "virtual_tour": "No",
+  "floor_plan": "No",
+  "poor_photo_sequence": true,
+  "bad_lead_photo": false,
+  "no_professional_photography": false,
+  "poor_photography_quality": false,
+  "floor_plan_in_photos": false,
+  "virtual_tour_in_photos": false
+}

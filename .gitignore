@@ -1,1 +1,6 @@
 .env
+.env.local
+
+# Session / auth (never commit)
+browser_session/
+config/auth.json

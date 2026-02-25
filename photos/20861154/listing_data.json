@@ -1,0 +1,22 @@
+{
+  "price": "$320,000",
+  "sqft": "1,445",
+  "mud": "No",
+  "pid": "No",
+  "beds": "3",
+  "baths": "2",
+  "year_built": "2024",
+  "dom": "48",
+  "photos_total": "8",
+  "address": "2544 Bunkerton Drive",
+  "city": "Fort Worth",
+  "mls": "20861154",
+  "virtual_tour": "No",
+  "floor_plan": "No",
+  "poor_photo_sequence": true,
+  "no_professional_photography": true,
+  "bad_lead_photo": false,
+  "poor_photography_quality": false,
+  "floor_plan_in_photos": false,
+  "virtual_tour_in_photos": false
+}

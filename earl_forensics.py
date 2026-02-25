@@ -72,8 +72,7 @@ def run_earl_audit(mls):
             img.save(buf, format="JPEG", quality=85)
             parts.append({"inline_data": {"mime_type": "image/jpeg", "data": base64.b64encode(buf.getvalue()).decode()}})
 
-    parts.insert(0, {"text": "Scan these MLS listing photos. Only report what you can actually confirm you see. Look for: floor plan image present or absent, virtual tour screenshot present or absent, photo quality issues, photo sequence flow problems, lead photo subject. A virtual tour is only confirmed if you see a Matterport or 3D tour screenshot. Do not guess."})
-
+    parts.insert(0, {"text": "Scan these MLS listing photos and return a JSON object with these exact keys. Only flag TRUE if you are confident. Be strict. bad_lead_photo: true if first photo is NOT a proper front exterior. poor_photo_sequence: true if photos have no logical flow. no_professional_photography: true if photos look like phone snapshots. poor_photography_quality: true if professional camera but poor execution. floor_plan_in_photos: true if ANY photo shows a floor plan diagram or blueprint layout of the home. virtual_tour_in_photos: true if ANY photo shows a Matterport or 3D tour screenshot. visual_notes: brief summary. Return ONLY valid JSON, nothing else."})
     print("Gemini scanning photos...")
     try:
         with httpx.Client(timeout=120.0) as client:
@@ -82,8 +81,34 @@ def run_earl_audit(mls):
             if "candidates" not in data:
                 print("Gemini error: " + str(data))
                 return
-            visual_notes = data["candidates"][0]["content"]["parts"][0]["text"]
+            gemini_raw = data["candidates"][0]["content"]["parts"][0]["text"]
             print("Gemini done.")
+            # Parse visual flags from Gemini JSON response
+            visual_flags = {}
+            visual_notes = gemini_raw
+            try:
+                clean = gemini_raw.strip().replace("```json","").replace("```","").strip()
+                visual_flags = json.loads(clean)
+                visual_notes = visual_flags.pop("visual_notes", gemini_raw)
+                # Save visual flags back to listing_data.json
+                # Only update if not already true (sticky flags)
+                for k, v in visual_flags.items():
+                    if not listing_data.get(k):
+                        listing_data[k] = v
+                with open(json_path, "w") as jf:
+                    json.dump(listing_data, jf, indent=2)
+                print("Visual flags saved: " + str(visual_flags))
+                # Override floor_plan and virtual_tour if found in photos
+                if visual_flags.get("floor_plan_in_photos"):
+                    listing_data["floor_plan"] = "Yes"
+                    print("Floor plan found in photos — overriding to Yes.")
+                if visual_flags.get("virtual_tour_in_photos"):
+                    listing_data["virtual_tour"] = "Yes"
+                    print("Virtual tour found in photos — overriding to Yes.")
+                with open(json_path, "w") as jf:
+                    json.dump(listing_data, jf, indent=2)
+            except Exception as ve:
+                print("Could not parse Gemini JSON: " + str(ve))
     except Exception as e:
         print("Gemini error: " + str(e))
         return
