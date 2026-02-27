@@ -57,11 +57,24 @@ def scrape_listing_data(page):
         if addr_match:
             data["address"] = addr_match.group(1).strip()
             data["city"] = addr_match.group(2).strip()
+        all_rooms = []
         missing_dims = []
         room_section = re.findall(r'([A-Z][a-zA-Z\s]+?)\s+(\d+\s*x\s*\d+|1\s*x\s*1)', full_text)
         for room, dim in room_section:
-            if dim.strip() in ["1 x 1", "1x1"]:
-                missing_dims.append(room.strip())
+            room_clean = room.strip()
+            dim_clean = dim.strip()
+            all_rooms.append({"room": room_clean, "dimensions": dim_clean})
+            is_key_room = any(k in room_clean.lower() for k in ["bedroom", "primary", "living room", "living area"])
+            if is_key_room and dim_clean in ["1 x 1", "1x1"]:
+                missing_dims.append(room_clean)
+        key_room_names = ["bedroom", "primary", "living room", "living area"]
+        found_key_rooms = [r["room"].lower() for r in all_rooms if any(k in r["room"].lower() for k in key_room_names)]
+        for key in key_room_names:
+            if key in ["bedroom", "primary"]:
+                if not any(key in r for r in found_key_rooms):
+                    missing_dims.append(key.title() + " (no dimensions found)")
+        if all_rooms:
+            data["rooms"] = all_rooms
         if missing_dims:
             data["bad_dimensions"] = "Yes"
             data["bad_dimension_rooms"] = missing_dims

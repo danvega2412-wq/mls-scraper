@@ -1,0 +1,68 @@
+{
+  "price": "$679,000",
+  "sqft": "3,299",
+  "mud": "No",
+  "pid": "Yes",
+  "beds": "4",
+  "baths": "3",
+  "year_built": "2022",
+  "dom": "301",
+  "photos_total": "31",
+  "address": "2087 Roquette Drive",
+  "city": "Haslet",
+  "rooms": [
+    {
+      "room": "Lvl\tFeatures\nLiving Room",
+      "dimensions": "16 x 18"
+    },
+    {
+      "room": "Primary",
+      "dimensions": "14 x 17"
+    },
+    {
+      "room": "Kitchen",
+      "dimensions": "12 x 19"
+    },
+    {
+      "room": "Pantry\n\t\t\n\t\t\nBedroom",
+      "dimensions": "13 x 12"
+    },
+    {
+      "room": "Bedroom",
+      "dimensions": "13 x 11"
+    },
+    {
+      "room": "Bedroom",
+      "dimensions": "11 x 14"
+    },
+    {
+      "room": "Media Room",
+      "dimensions": "17 x 14"
+    },
+    {
+      "room": "Dining Room",
+      "dimensions": "11 x 13"
+    },
+    {
+      "room": "Utility Room",
+      "dimensions": "9 x 8"
+    },
+    {
+      "room": "Separate Utility Room\n\t\t\n\t\t\nOffice",
+      "dimensions": "12 x 11"
+    },
+    {
+      "room": "Game Room",
+      "dimensions": "20 x 15"
+    }
+  ],
+  "mls": "20789963",
+  "virtual_tour": "No",
+  "floor_plan": "No",
+  "floor_plan_in_photos": true,
+  "bad_lead_photo": false,
+  "poor_photo_sequence": false,
+  "no_professional_photography": false,
+  "poor_photography_quality": false,
+  "virtual_tour_in_photos": false
+}

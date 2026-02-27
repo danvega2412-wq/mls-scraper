@@ -10,6 +10,11 @@
   "photos_total": "8",
   "address": "2544 Bunkerton Drive",
   "city": "Fort Worth",
+  "bad_dimensions": "Yes",
+  "bad_dimension_rooms": [
+    "Bedroom (no dimensions found)",
+    "Primary (no dimensions found)"
+  ],
   "mls": "20861154",
   "virtual_tour": "No",
   "floor_plan": "No",
