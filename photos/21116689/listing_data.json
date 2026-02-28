@@ -1,0 +1,64 @@
+{
+  "price": "$259,900",
+  "sqft": "1,808",
+  "mud": "No",
+  "pid": "No",
+  "beds": "4",
+  "baths": "3",
+  "year_built": "1954",
+  "dom": "46",
+  "photos_total": "27",
+  "address": "5632 Fursman Avenue",
+  "city": "Fort Worth",
+  "rooms": [
+    {
+      "room": "Primary",
+      "dimensions": "15 x 12"
+    },
+    {
+      "room": "Lvl\tFeatures\nLiving Room",
+      "dimensions": "17 x 16"
+    },
+    {
+      "room": "Dining Room",
+      "dimensions": "14 x 11"
+    },
+    {
+      "room": "Kitchen",
+      "dimensions": "16 x 9"
+    },
+    {
+      "room": "Primary",
+      "dimensions": "9 x 8"
+    },
+    {
+      "room": "Separate Shower\n\t\t\n\t\t\nBedroom",
+      "dimensions": "12 x 11"
+    },
+    {
+      "room": "Ensuite Bath\n\n\n\t\t\n\t\t\nBedroom",
+      "dimensions": "11 x 13"
+    },
+    {
+      "room": "Bedroom",
+      "dimensions": "14 x 13"
+    },
+    {
+      "room": "Full",
+      "dimensions": "5 x 9"
+    },
+    {
+      "room": "Full",
+      "dimensions": "10 x 9"
+    }
+  ],
+  "mls": "21116689",
+  "virtual_tour": "No",
+  "floor_plan": "No",
+  "bad_lead_photo": false,
+  "poor_photo_sequence": false,
+  "no_professional_photography": false,
+  "poor_photography_quality": false,
+  "floor_plan_in_photos": false,
+  "virtual_tour_in_photos": false
+}

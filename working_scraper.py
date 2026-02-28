@@ -65,7 +65,7 @@ def scrape_listing_data(page):
             dim_clean = dim.strip()
             all_rooms.append({"room": room_clean, "dimensions": dim_clean})
             is_key_room = any(k in room_clean.lower() for k in ["bedroom", "primary", "living room", "living area"])
-            if is_key_room and dim_clean in ["1 x 1", "1x1"]:
+            if is_key_room and dim_clean in ["1 x 1", "1x1", "0 x 0", "0x0"]:
                 missing_dims.append(room_clean)
         key_room_names = ["bedroom", "primary", "living room", "living area"]
         found_key_rooms = [r["room"].lower() for r in all_rooms if any(k in r["room"].lower() for k in key_room_names)]
