@@ -1,0 +1,72 @@
+{
+  "price": "$413,000",
+  "sqft": "2,115",
+  "mud": "No",
+  "pid": "No",
+  "beds": "4",
+  "baths": "2",
+  "year_built": "2003",
+  "dom": "180",
+  "photos_total": "35",
+  "address": "3901 Glenwyck Drive",
+  "city": "North Richland Hills",
+  "rooms": [
+    {
+      "room": "Lvl\tFeatures\nKitchen",
+      "dimensions": "11 x 15"
+    },
+    {
+      "room": "Lvl\tFeatures\nFamily Room",
+      "dimensions": "17 x 16"
+    },
+    {
+      "room": "Fireplace\n\n\n\t\t\n\t\t\nLiving Room",
+      "dimensions": "12 x 11"
+    },
+    {
+      "room": "Primary",
+      "dimensions": "16 x 15"
+    },
+    {
+      "room": "Bedroom",
+      "dimensions": "11 x 12"
+    },
+    {
+      "room": "Bedroom",
+      "dimensions": "9 x 12"
+    },
+    {
+      "room": "Bedroom",
+      "dimensions": "9 x 14"
+    },
+    {
+      "room": "Primary",
+      "dimensions": "8 x 9"
+    },
+    {
+      "room": "Full",
+      "dimensions": "7 x 8"
+    },
+    {
+      "room": "Cabinets\n\t\t\n\t\t\nUtility Room",
+      "dimensions": "6 x 8"
+    },
+    {
+      "room": "Dry Area\n\n\n\t\t\n\t\t\nDining Room",
+      "dimensions": "10 x 11"
+    },
+    {
+      "room": "Breakfast Rm",
+      "dimensions": "8 x 15"
+    }
+  ],
+  "mls": "21048848",
+  "virtual_tour": "No",
+  "floor_plan": "Yes",
+  "floor_plan_in_photos": true,
+  "bad_lead_photo": false,
+  "poor_photo_sequence": false,
+  "no_professional_photography": false,
+  "poor_photography_quality": false,
+  "virtual_tour_in_photos": false
+}

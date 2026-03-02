@@ -1,0 +1,60 @@
+{
+  "price": "$384,500",
+  "sqft": "2,014",
+  "mud": "Yes",
+  "pid": "No",
+  "beds": "4",
+  "baths": "2",
+  "year_built": "2022",
+  "dom": "71",
+  "photos_total": "40",
+  "address": "1832 Chamaeleon Drive",
+  "city": "Haslet",
+  "rooms": [
+    {
+      "room": "Primary",
+      "dimensions": "14 x 13"
+    },
+    {
+      "room": "Lvl\tFeatures\nDining Room",
+      "dimensions": "12 x 9"
+    },
+    {
+      "room": "Kitchen",
+      "dimensions": "23 x 14"
+    },
+    {
+      "room": "Water Line to Refrigerator\n\t\t\n\t\t\nLaundry",
+      "dimensions": "9 x 6"
+    },
+    {
+      "room": "Living Room",
+      "dimensions": "18 x 15"
+    },
+    {
+      "room": "Bedroom",
+      "dimensions": "14 x 10"
+    },
+    {
+      "room": "Split Bedrooms\n\n\n\t\t\n\t\t\nBedroom",
+      "dimensions": "14 x 10"
+    },
+    {
+      "room": "Bedroom",
+      "dimensions": "12 x 9"
+    },
+    {
+      "room": "Office",
+      "dimensions": "6 x 4"
+    }
+  ],
+  "mls": "21135328",
+  "virtual_tour": "No",
+  "floor_plan": "Yes",
+  "floor_plan_in_photos": true,
+  "bad_lead_photo": false,
+  "poor_photo_sequence": false,
+  "no_professional_photography": false,
+  "poor_photography_quality": false,
+  "virtual_tour_in_photos": false
+}
