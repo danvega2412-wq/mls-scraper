@@ -119,6 +119,57 @@ def check_virtual_tour_and_floor_plan(page, context):
         log(f"Virtual tour check error: {e}")
         return {"virtual_tour": "Not confirmed", "floor_plan": "Not confirmed"}
 
+def grab_first_photo(page, context, photo_dir):
+    """Click the first photo in the grid and save it as photo_1.jpg for the PDF cover."""
+    try:
+        log("Looking for first photo in grid...")
+        # Find all images in the photo grid
+        imgs = page.locator("img").all()
+        photo_url = None
+        for img in imgs:
+            src = img.get_attribute("src") or ""
+            # MLS photo URLs typically contain 'photo', 'image', or the MLS ID
+            if any(x in src.lower() for x in ["photo", "image", "listing", "mls"]) and src.startswith("http"):
+                photo_url = src
+                log(f"Found photo URL: {photo_url}")
+                break
+
+        # Fallback: click the first visible image and intercept the full-size URL
+        if not photo_url:
+            log("Trying click approach for first photo...")
+            first_img = page.locator("img").first
+            first_img.click()
+            time.sleep(2)
+            # After click, look for a larger version
+            large_imgs = page.locator("img").all()
+            for img in large_imgs:
+                src = img.get_attribute("src") or ""
+                if src.startswith("http") and len(src) > 30:
+                    photo_url = src
+                    break
+
+        if photo_url:
+            import requests
+            cookies = context.cookies()
+            cookie_header = "; ".join([f"{c['name']}={c['value']}" for c in cookies])
+            r = requests.get(photo_url, headers={
+                "Cookie": cookie_header,
+                "Referer": BASE_URL,
+                "User-Agent": "Mozilla/5.0"
+            })
+            if r.status_code == 200 and len(r.content) > 5000:
+                with open(f"{photo_dir}/photo_1.jpg", "wb") as pf:
+                    pf.write(r.content)
+                log(f"Saved photo_1.jpg ({len(r.content)} bytes)")
+                return True
+            else:
+                log(f"Photo download failed: status {r.status_code}, size {len(r.content)}")
+        else:
+            log("Could not find a photo URL")
+    except Exception as e:
+        log(f"First photo grab error: {e}")
+    return False
+
 def main():
     if len(sys.argv) < 2:
         print("Usage: python3 working_scraper.py <MLS_NUMBER>")
@@ -137,32 +188,49 @@ def main():
         page.goto(f"{BASE_URL}/Matrix/Default.aspx")
         time.sleep(3)
         if "login" in page.url or "clareity" in page.url:
-            log("Session expired — MFA required. Relaunching visible browser...")
+            log("Session expired — relaunching visible browser to log in...")
             browser.close()
             browser = p.chromium.launch(headless=False)
             context = browser.new_context()
             page = context.new_page()
             page.goto(f"{BASE_URL}/Matrix/Default.aspx")
             time.sleep(3)
+
+            if USERNAME and PASSWORD:
+                try:
+                    page.wait_for_selector(
+                        "input[name='username'], input[id='username'], input[type='text']",
+                        timeout=10000
+                    )
+                    page.fill("input[name='username'], input[id='username']", USERNAME)
+                    page.fill("input[name='password'], input[id='password'], input[type='password']", PASSWORD)
+                    time.sleep(1)
+                    page.get_by_role("button", name="Login").click()
+                    log("Credentials filled. Waiting for MFA or dashboard...")
+                    time.sleep(4)
+                except Exception as e:
+                    log(f"Auto-fill skipped ({e}). Waiting for manual login...")
+            else:
+                log("No credentials in .env — please log in manually in the browser.")
+
+            log("Waiting up to 2 minutes for you to complete login/MFA...")
             try:
-                page.wait_for_selector("input[name='username'], input[id='username']", timeout=10000)
-                page.fill("input[name='username'], input[id='username']", USERNAME)
-                page.fill("input[name='password'], input[id='password'], input[type='password']", PASSWORD)
-                time.sleep(1)
-                page.get_by_role("button", name="Login").click()
-                time.sleep(5)
-            except:
-                log("Login form not found, waiting for MFA...")
-            if "login" in page.url or "clareity" in page.url:
-                log("MFA required. You have 60 seconds...")
-                time.sleep(60)
+                page.wait_for_selector(
+                    "input[placeholder*='Shorthand'], #m_MainNav, a:has-text('Residential')",
+                    timeout=120000
+                )
+                log("Dashboard detected.")
+            except Exception:
+                log("Dashboard not detected — saving session anyway and continuing.")
+
             context.storage_state(path=SESSION_PATH)
-            log("Session saved.")
-        log("Navigating to Matrix...")
+            log("Session saved. Future runs will skip login.")
+
+        log("Navigating to Matrix search...")
         page.goto(f"{BASE_URL}/Matrix/Default.aspx")
-        time.sleep(3)
+        time.sleep(4)
         log("Searching for listing...")
-        page.wait_for_selector("input[placeholder*='Shorthand']", timeout=30000)
+        page.wait_for_selector("input[placeholder*='Shorthand']", timeout=60000)
         search = page.locator("input[placeholder*='Shorthand']").first
         search.fill(mls_number)
         search.press("Enter")
@@ -182,7 +250,6 @@ def main():
         log(f"Tour check: {tour_data}")
         photo_dir = f"photos/{mls_number}"
         os.makedirs(photo_dir, exist_ok=True)
-        # Preserve existing visual flags if present
         existing_json_path = f"{photo_dir}/listing_data.json"
         visual_flag_keys = ["bad_lead_photo", "poor_photo_sequence", "no_professional_photography", "poor_photography_quality", "floor_plan_in_photos", "virtual_tour_in_photos"]
         if os.path.exists(existing_json_path):
@@ -200,6 +267,10 @@ def main():
             log("Clicking Photos tab...")
             page.get_by_role("link", name="Photos").click()
             time.sleep(3)
+
+            # Grab first individual photo for PDF cover
+            grab_first_photo(page, context, photo_dir)
+
             log("Capturing photo grid...")
             for i in range(1, 4):
                 page.screenshot(path=f"{photo_dir}/grid_part_{i}.jpg", full_page=True)

@@ -1,0 +1,51 @@
+{
+  "price": "$575,000",
+  "sqft": "4,261",
+  "mud": "No",
+  "pid": "No",
+  "beds": "4",
+  "baths": "5",
+  "year_built": "1991",
+  "dom": "16",
+  "photos_total": "13",
+  "address": "2503 Twelve Oaks Lane",
+  "city": "Colleyville",
+  "rooms": [
+    {
+      "room": "Primary",
+      "dimensions": "1 x 1"
+    },
+    {
+      "room": "Primary",
+      "dimensions": "1 x 1"
+    },
+    {
+      "room": "Kitchen",
+      "dimensions": "1 x 1"
+    },
+    {
+      "room": "Living Room",
+      "dimensions": "1 x 1"
+    },
+    {
+      "room": "Laundry",
+      "dimensions": "1 x 1"
+    }
+  ],
+  "bad_dimensions": "Yes",
+  "bad_dimension_rooms": [
+    "Primary",
+    "Primary",
+    "Living Room",
+    "Bedroom (no dimensions found)"
+  ],
+  "mls": "21160633",
+  "virtual_tour": "No",
+  "floor_plan": "No",
+  "bad_lead_photo": false,
+  "poor_photo_sequence": false,
+  "no_professional_photography": false,
+  "poor_photography_quality": false,
+  "floor_plan_in_photos": false,
+  "virtual_tour_in_photos": false
+}

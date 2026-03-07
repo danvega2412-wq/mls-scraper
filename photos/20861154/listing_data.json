@@ -19,9 +19,5 @@
   "virtual_tour": "No",
   "floor_plan": "No",
   "poor_photo_sequence": true,
-  "no_professional_photography": true,
-  "bad_lead_photo": false,
-  "poor_photography_quality": false,
-  "floor_plan_in_photos": false,
-  "virtual_tour_in_photos": false
+  "no_professional_photography": true
 }
