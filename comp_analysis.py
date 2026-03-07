@@ -89,7 +89,20 @@ def get_comp_data(address, city, state, beds, baths, sqft, subject_price):
     if not best_comps:
         print("Comps: none found after all stages")
         return None
-    return {"avm": best_avm, "subject_price": subject_price, "comps": best_comps[:5]}
+    # Deduplicate comps by address and sqft+price+status fingerprint
+    seen_addr = set()
+    seen_fp = set()
+    deduped = []
+    for c in best_comps:
+        addr = c.get("address", "").strip().lower()
+        sqft_r = round((c.get("sqft", 0) or 0) / 25) * 25
+        fp = (sqft_r, c.get("price", 0), c.get("status", ""))
+        if addr in seen_addr or fp in seen_fp:
+            continue
+        seen_addr.add(addr)
+        seen_fp.add(fp)
+        deduped.append(c)
+    return {"avm": best_avm, "subject_price": subject_price, "comps": deduped[:5]}
 def build_label(comp):
     beds = comp.get("beds", "?")
     baths = comp.get("baths", "?")
@@ -104,11 +117,11 @@ def build_color(comp):
     status = comp.get("status", "")
     dom = comp.get("dom", 0) or 0
     if status == "Active" and dom > 180:
-        return "#CC0000"
+        return "#990000"
     elif status == "Active":
-        return "#FF8C00"
+        return "#CC3333"
     else:
-        return "#002349"
+        return "#4A90D9"
 
 def build_bar_label(comp):
     price = "$" + "{:,}".format(comp["price"])
@@ -130,19 +143,25 @@ def generate_chart_image(comp_data, output_path, subject_beds=None, subject_bath
     colors = ["#D4AF37", "#C0C0C0"] + [build_color(c) for c in comps]
     bar_labels = ["$" + "{:,}".format(subject_price), "$" + "{:,}".format(avm)] + [build_bar_label(c) for c in comps]
     fig, ax = plt.subplots(figsize=(14, 6))
+    fig.patch.set_facecolor("#0A0A0A")
+    ax.set_facecolor("#0A0A0A")
+    for spine in ax.spines.values():
+        spine.set_edgecolor("#C9A84C")
+    ax.tick_params(axis="x", colors="white")
+    ax.tick_params(axis="y", colors="white")
     bars = ax.bar(range(len(labels)), data, color=colors, width=0.6)
     ax.set_xticks(range(len(labels)))
-    ax.set_xticklabels(labels, rotation=20, ha="right", fontsize=9)
+    ax.set_xticklabels(labels, rotation=20, ha="right", fontsize=9, color="white")
     ax.set_ylim(0, int((max(data) * 1.15) / 50000 + 1) * 50000)
     ax.yaxis.set_major_locator(mticker.MultipleLocator(50000))
     ax.yaxis.set_major_formatter(mticker.FuncFormatter(lambda x, p: "$" + str(int(x))))
-    ax.set_title("Your Listing vs The Market", fontsize=16, pad=15)
-    ax.grid(axis="y", linestyle="--", alpha=0.4)
+    ax.set_title("Your Listing vs The Market", fontsize=16, pad=15, color="white")
+    ax.grid(axis="y", linestyle="--", alpha=0.3, color="#C9A84C")
     for bar, label in zip(bars, bar_labels):
         ax.text(bar.get_x() + bar.get_width()/2, bar.get_height() + 3000,
-                label, ha="center", va="bottom", fontsize=7, fontweight="bold")
+                label, ha="center", va="bottom", fontsize=7, fontweight="bold", color="white")
     plt.tight_layout()
-    plt.savefig(output_path, dpi=150, bbox_inches="tight")
+    plt.savefig(output_path, dpi=150, bbox_inches="tight", facecolor="#0A0A0A")
     plt.close()
     return output_path
 
