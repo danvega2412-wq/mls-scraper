@@ -1,14 +1,14 @@
 import os, json
 from dotenv import load_dotenv
-load_dotenv(dotenv_path='../.env')
+load_dotenv(dotenv_path='/Users/danielvega/Desktop/Real Estate Tool/.env', override=False)
+load_dotenv(dotenv_path='/Users/danielvega/Desktop/Real Estate Tool/mls-scraper/.env', override=True)
 from pinecone import Pinecone, ServerlessSpec
 
-PINECONE_KEY = os.environ.get('PINECONE_API_KEY')
-CLAUDE_KEY = os.environ.get("ANTHROPIC_API_KEY")
 INDEX_NAME = 'earl-audits'
 
 def get_index():
-    pc = Pinecone(api_key=PINECONE_KEY)
+    load_dotenv(dotenv_path='/Users/danielvega/Desktop/Real Estate Tool/mls-scraper/.env', override=True)
+    pc = Pinecone(api_key=os.environ.get('PINECONE_API_KEY', ''))
     existing = [i.name for i in pc.list_indexes()]
     if INDEX_NAME not in existing:
         print('Creating Pinecone index...')
@@ -21,18 +21,9 @@ def get_index():
         print('Index created.')
     return pc.Index(INDEX_NAME)
 
-def get_embedding(text):
-    import httpx
-    with httpx.Client(timeout=30.0) as client:
-        res = client.post('https://api.anthropic.com/v1/messages',
-            headers={'x-api-key': CLAUDE_KEY, 'anthropic-version': '2023-06-01', 'content-type': 'application/json'},
-            json={'model': 'claude-sonnet-4-5', 'max_tokens': 10,
-                  'messages': [{'role': 'user', 'content': 'embed: ' + text[:500]}]})
-    return None
-
 def save_approved_audit(mls, listing_data, report_text):
     import httpx, hashlib
-    pc = Pinecone(api_key=PINECONE_KEY)
+    pc = Pinecone(api_key=os.environ.get("PINECONE_API_KEY", ''))
     existing = [i.name for i in pc.list_indexes()]
     if INDEX_NAME not in existing:
         get_index()
@@ -66,7 +57,7 @@ def save_approved_audit(mls, listing_data, report_text):
 
 def get_similar_audits(listing_data, n=3):
     import httpx
-    pc = Pinecone(api_key=PINECONE_KEY)
+    pc = Pinecone(api_key=os.environ.get("PINECONE_API_KEY", ''))
     existing = [i.name for i in pc.list_indexes()]
     if INDEX_NAME not in existing:
         return []
@@ -85,6 +76,27 @@ def get_similar_audits(listing_data, n=3):
     return [m['metadata']['report'] for m in results['matches'] if 'report' in m['metadata']]
 
 if __name__ == '__main__':
+    import hashlib
     print('Setting up Pinecone index...')
     get_index()
     print('RAG system ready.')
+
+    # Diagnostic test
+    mls = 'TEST_MLS_001'
+    listing_data = {'price': 500000, 'dom': 10, 'sqft': 2000, 'city': 'TestCity'}
+    report_text = 'Diagnostic audit report for RAG system test.'
+    doc_id = 'audit_' + mls + '_' + hashlib.md5(report_text.encode()).hexdigest()[:8]
+
+    ok = save_approved_audit(mls, listing_data, report_text)
+    print('save_approved_audit():', 'PASS' if ok else 'FAIL')
+
+    pc = Pinecone(api_key=os.environ.get("PINECONE_API_KEY", ''))
+    index = pc.Index(INDEX_NAME)
+    fetched = index.fetch(ids=[doc_id])
+    fetch_ok = doc_id in fetched.vectors
+    print('fetch by ID:', 'PASS' if fetch_ok else 'FAIL')
+
+    index.delete(ids=[doc_id])
+    deleted = index.fetch(ids=[doc_id])
+    delete_ok = doc_id not in deleted.vectors
+    print('delete:', 'PASS' if delete_ok else 'FAIL')
